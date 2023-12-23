@@ -1,0 +1,30 @@
+$(document).ready(function(){
+	$('form[id^=form-]').submit(transferFormData);
+});
+
+function transferFormData(event){
+	//останавливаем подтверждение формы
+	event.preventDefault();
+	
+	
+	//собираем массив с данными для передачи
+	var formData = new Array();
+	formData = $('form#' + event.currentTarget.id).serializeArray();
+
+	$.ajax({
+		type: "post",
+		url: '/cf_constructor/form_ajax',
+		data: formData,
+		dataType: "json",
+		success: function(json) {
+			if (json.errors){
+				$('form#' + event.currentTarget.id + ' + #form_info').html('<p class="error">'+json.message+'</p><ul>'+json.errors+'</ul>');
+				$('form#' + event.currentTarget.id + ' .cap_image').empty().html(json.cap_image);
+			} else{
+				$('form[id^=form-]').fadeOut().empty();
+				$('form#' + event.currentTarget.id + ' + #form_info').html('<p class="success">'+json.message+'</p>');
+			}
+		}
+	});
+	
+}
